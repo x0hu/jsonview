@@ -1,29 +1,57 @@
 @charset "UTF-8";
 
+:root {
+  --json-background: #ffffff;
+  --json-foreground: #24292f;
+  --json-link: #0969da;
+  --json-link-visited: #8250df;
+  --json-property: #0550ae;
+  --json-string: #116329;
+  --json-number: #953800;
+  --json-boolean: #8250df;
+  --json-null: #cf222e;
+  --json-callback: #6f42c1;
+  --json-error-border: #d0d7de;
+  --json-error-background: #f6f8fa;
+  --json-error-foreground: #cf222e;
+  --json-error-line: #ffebe9;
+}
+
 body {
+  background-color: var(--json-background);
+  color: var(--json-foreground);
   font-family: sans-serif;
   margin: 0;
   padding: 0;
 }
 
+a {
+  color: var(--json-link);
+}
+
+a:visited {
+  color: var(--json-link-visited);
+}
+
 .prop {
-  font-weight: bold;
+  color: var(--json-property);
+  font-weight: 600;
 }
 
 .null {
-  color: #a52a2a;
+  color: var(--json-null);
 }
 
 .bool {
-  color: blue;
+  color: var(--json-boolean);
 }
 
 .num {
-  color: blue;
+  color: var(--json-number);
 }
 
 .string {
-  color: green;
+  color: var(--json-string);
   white-space: pre-wrap;
 }
 
@@ -78,8 +106,8 @@ li {
 }
 
 #error {
-  border-bottom: 1px solid rgb(212, 209, 209);
-  background-color: rgb(239, 239, 239);
+  border-bottom: 1px solid var(--json-error-border);
+  background-color: var(--json-error-background);
   margin-bottom: 1.5em;
   padding: 1em 0.5em;
 }
@@ -87,16 +115,16 @@ li {
 .errormessage {
   font-family: monospace;
   margin-top: 0.5em;
-  color: rgb(167, 5, 5);
+  color: var(--json-error-foreground);
 }
 
 .errorcolumn {
-  background-color: rgb(167, 5, 5);
+  background-color: var(--json-error-foreground);
   color: white;
 }
 
 .errorline {
-  background-color: rgb(255, 226, 226);
+  background-color: var(--json-error-line);
 }
 
 #json {
@@ -123,63 +151,25 @@ h1 {
 
 .callback {
   font-family: monospace;
-  color: #a52a2a;
+  color: var(--json-callback);
 }
 
-/* Tomorrow Night theme */
 @media (prefers-color-scheme: dark) {
-  body {
-    background-color: #27292c;
-    color: #d7dad8;
-  }
-
-  a {
-    color: #4c9edd;
-  }
-  a:visited {
-    color: #b678c7;
-  }
-
-  .bool {
-    color: #92b2ca;
-  }
-
-  .num {
-    color: #92b2ca;
-  }
-
-  .null {
-    color: #d77c78;
-  }
-
-  .callback {
-    color: #d77c78;
-  }
-
-  .string {
-    color: #c2c77b;
-  }
-
-  #error {
-    border-bottom: 1px solid rgb(61, 61, 61);
-    background-color: rgb(37, 37, 37);
-    margin-bottom: 1.5em;
-    padding: 1em 0.5em;
-  }
-
-  .errormessage {
-    font-family: monospace;
-    margin-top: 0.5em;
-    color: rgb(212, 10, 10);
-  }
-
-  .errorcolumn {
-    background-color: rgb(212, 10, 10);
-    color: white;
-  }
-
-  .errorline {
-    background-color: rgb(32, 29, 29);
+  :root {
+    --json-background: #1f2221;
+    --json-foreground: #d7dad8;
+    --json-link: #4c9edd;
+    --json-link-visited: #b678c7;
+    --json-property: #d7dad8;
+    --json-string: #c2c77b;
+    --json-number: #92b2ca;
+    --json-boolean: #b678c7;
+    --json-null: #ff7b72;
+    --json-callback: #d77c78;
+    --json-error-border: #30363d;
+    --json-error-background: #161b22;
+    --json-error-foreground: #ff7b72;
+    --json-error-line: #490202;
   }
 }
 
