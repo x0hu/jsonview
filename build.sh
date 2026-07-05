@@ -4,7 +4,7 @@ rm -rf ts-out
 
 tsc
 
-node --test
+node --test ts-out/*.test.js
 
 # Chrome
 rm -rf build-chrome

@@ -73,6 +73,16 @@ function decorateWithSpan(value: any, className: string) {
   return `<span class="${className}">${htmlEncode(value)}</span>`;
 }
 
+function linkHrefForString(value: string) {
+  if (/^(http|https|file):\/\/[^\s]+$/i.test(value)) {
+    return value;
+  }
+  if (/^ipfs:\/\/[^\s]+$/i.test(value)) {
+    return `https://ipfs.io/ipfs/${value.slice("ipfs://".length)}`;
+  }
+  return undefined;
+}
+
 // Convert a basic JSON datatype (number, string, boolean, null, object, array) into an HTML fragment.
 export function valueToHTML(value: any, path: string, indent: number) {
   if (value === null) {
@@ -92,8 +102,10 @@ export function valueToHTML(value: any, path: string, indent: number) {
     case "string":
       if (value.charCodeAt(0) === 8203 /* zero-width space */ && !isNaN(Number(value.slice(1)))) {
         return decorateWithSpan(Number(value.slice(1)), "num");
-      } else if (/^(http|https|file):\/\/[^\s]+$/i.test(value)) {
-        return `<a href="${htmlEncode(value)}"><span class="q">&quot;</span>${jsString(
+      }
+      const linkHref = linkHrefForString(value);
+      if (linkHref !== undefined) {
+        return `<a href="${htmlEncode(linkHref)}"><span class="q">&quot;</span>${jsString(
           value,
         )}<span class="q">&quot;</span></a>`;
       } else {

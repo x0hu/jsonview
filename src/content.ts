@@ -1,6 +1,7 @@
 import { errorPage, jsonToHTML } from "./jsonformatter";
 
 import { installCollapseEventListeners } from "./collapse";
+import { ipfsRawGatewayUrls, isIpfsGatewayUrl } from "./ipfs";
 import { safeStringEncodeNums } from "./safe-encode-numbers";
 
 /**
@@ -8,7 +9,19 @@ import { safeStringEncodeNums } from "./safe-encode-numbers";
  * to help decide whether to treat the contents of the page as JSON.
  */
 chrome.runtime.sendMessage("jsonview-is-json", (response: boolean) => {
-  if (!response) {
+  void renderJson(response);
+});
+
+async function renderJson(response: boolean) {
+  const isKnownJsonResponse = response === true;
+  const shouldTryJsonResponse = !isKnownJsonResponse && isIpfsGatewayUrl(document.URL);
+
+  if (shouldTryJsonResponse) {
+    await renderIpfsGatewayResponse();
+    return;
+  }
+
+  if (!isKnownJsonResponse) {
     return;
   }
 
@@ -42,4 +55,25 @@ chrome.runtime.sendMessage("jsonview-is-json", (response: boolean) => {
 
   document.documentElement.innerHTML = outputDoc;
   installCollapseEventListeners();
-});
+}
+
+async function renderIpfsGatewayResponse() {
+  for (const gatewayUrl of ipfsRawGatewayUrls(document.URL)) {
+    let content: string;
+    try {
+      const response = await fetch(gatewayUrl, { credentials: "omit" });
+      content = await response.text();
+    } catch {
+      continue;
+    }
+
+    try {
+      const jsonObj: unknown = JSON.parse(safeStringEncodeNums(content));
+      document.documentElement.innerHTML = jsonToHTML(jsonObj, document.URL);
+      installCollapseEventListeners();
+      return;
+    } catch {
+      continue;
+    }
+  }
+}
