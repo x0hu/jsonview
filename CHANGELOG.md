@@ -1,6 +1,10 @@
+## JSONView 3.3.1
+
+- Remove the private gateway from requests, documentation, and test fixtures. Race only the three public gateways.
+
 ## JSONView 3.3.0
 
-- Race four IPFS gateways and use the first usable response, cancelling the remaining requests.
+- Race public IPFS gateways and use the first usable response, cancelling the remaining requests.
 - Open nested IPFS media links without waiting for JSON failures or gateway timeouts.
 - Apply bundled JSON styles before rendering, including JSON inside gateway HTML wrappers.
 - Show the original public URL with Copy URL and Open original controls.

@@ -66,21 +66,19 @@ test("returns raw gateway candidates for IPFS content", () => {
     ),
     [
       "https://ipfs.io/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
-      "https://removed-gateway.invalid/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
       "https://gateway.pinata.cloud/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
       "https://gateway.ipfs.io/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
     ],
   );
 });
 
-test("races the same CID and path on all four hosts, retaining query parameters", () => {
+test("races the same CID and path on all three hosts, retaining query parameters", () => {
   const path =
     "/ipfs/QmWaZ7imFJPcYDLPUykLycbtG2DhmYckqXMosFVWx9DUsN/folder/meta.json?filename=meta.json";
   assert.deepEqual(
-    ipfsRawGatewayUrls(`https://removed-gateway.invalid${path}#fragment`),
+    ipfsRawGatewayUrls(`https://gateway.pinata.cloud${path}#fragment`),
     [
       `https://ipfs.io${path}`,
-      `https://removed-gateway.invalid${path}`,
       `https://gateway.pinata.cloud${path}`,
       `https://gateway.ipfs.io${path}`,
     ],

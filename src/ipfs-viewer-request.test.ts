@@ -47,11 +47,11 @@ test("a new user-triggered attempt can succeed after verification", async () => 
   assert.deepEqual(await requestIpfsForViewer(source, ignoreProgress, fetcher), {
     verificationRequired: true,
   });
-  assert.equal(calls, 4);
+  assert.equal(calls, 3);
   verified = true;
   const result = await requestIpfsForViewer(source, ignoreProgress, fetcher);
   assert.ok("content" in result);
-  assert.equal(calls, 8);
+  assert.equal(calls, 6);
 });
 
 test("ordinary failures still allow the normal navigation fallback", async () => {

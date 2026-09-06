@@ -136,7 +136,6 @@ export function ipfsRawGatewayUrls(url: string) {
   const path = `${ipfsUrlParts.namespace}/${ipfsUrlParts.identifier}${ipfsUrlParts.path}${ipfsUrlParts.search}`;
   return [
     `https://ipfs.io/${path}`,
-    `https://removed-gateway.invalid/${path}`,
     `https://gateway.pinata.cloud/${path}`,
     `https://gateway.ipfs.io/${path}`,
   ];

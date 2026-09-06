@@ -3,15 +3,15 @@ import test from "node:test";
 import { fetchIpfsJson, fetchIpfsResource, type IpfsGatewayProgress } from "./ipfs-fetch.js";
 
 const source =
-  "https://removed-gateway.invalid/ipfs/QmWaZ7imFJPcYDLPUykLycbtG2DhmYckqXMosFVWx9DUsN";
+  "https://gateway.pinata.cloud/ipfs/QmWaZ7imFJPcYDLPUykLycbtG2DhmYckqXMosFVWx9DUsN";
 
-test("starts all four gateways and cancels the slower requests after valid JSON arrives", async () => {
+test("starts all three gateways and cancels the slower requests after valid JSON arrives", async () => {
   const requests: string[] = [];
   const signals: AbortSignal[] = [];
   const fetcher: typeof fetch = (input, init) => {
     requests.push(input instanceof Request ? input.url : input.toString());
     signals.push(init!.signal!);
-    if (requests.length < 4) {
+    if (requests.length < 3) {
       return new Promise(() => {
         /* Simulate a stalled gateway. */
       });
@@ -19,7 +19,7 @@ test("starts all four gateways and cancels the slower requests after valid JSON 
     return Promise.resolve(new Response('{"winner":true}'));
   };
   const result = await fetchIpfsJson(source, fetcher, 100);
-  assert.equal(requests.length, 4);
+  assert.equal(requests.length, 3);
   assert.equal(new URL(result.url).hostname, "gateway.ipfs.io");
   assert.equal(result.content, '{"winner":true}');
   assert.ok(signals.every((signal) => signal.aborted));
@@ -77,7 +77,7 @@ test("opens a successful image response without waiting for stalled gateways", a
   const result = await fetchIpfsResource(source, fetcher, 100);
   assert.ok("media" in result);
   assert.equal(new URL(result.url).hostname, "gateway.pinata.cloud");
-  assert.equal(signals.length, 4);
+  assert.equal(signals.length, 3);
   assert.ok(signals.every((signal) => signal.aborted));
 });
 
@@ -88,14 +88,14 @@ test("reuses the browser's gateway cookies like a normal visit", async () => {
     return Promise.resolve(new Response('{"ok":true}'));
   };
   await fetchIpfsJson(source, fetcher, 100);
-  assert.deepEqual(credentials, ["include", "include", "include", "include"]);
+  assert.deepEqual(credentials, ["include", "include", "include"]);
 });
 
 test("never selects a response marked as a browser challenge", async () => {
   let count = 0;
   const fetcher: typeof fetch = () =>
     Promise.resolve(
-      ++count < 4
+      ++count < 3
         ? new Response('{"challenge":true}', { headers: { "cf-mitigated": "challenge" } })
         : new Response('{"ok":true}'),
     );
@@ -107,13 +107,10 @@ test("reports challenges and gateway failures while bounding a stalled request",
   const updates: IpfsGatewayProgress[] = [];
   const fetcher: typeof fetch = (input) => {
     const url = input instanceof Request ? input.url : input.toString();
-    if (url.includes("quicknode-ipfs.com")) {
+    if (url.includes("gateway.pinata.cloud")) {
       return new Promise(() => {
         /* Stalled gateway. */
       });
-    }
-    if (url.includes("gateway.pinata.cloud")) {
-      return Promise.resolve(new Response("<html>Gateway loading</html>"));
     }
     if (url.includes("gateway.ipfs.io")) {
       return Promise.resolve(new Response("Rate limited", { status: 429 }));
@@ -126,14 +123,14 @@ test("reports challenges and gateway failures while bounding a stalled request",
     fetchIpfsResource(source, fetcher, 25, (update) => updates.push(update)),
     /timed out/,
   );
-  assert.equal(updates.filter((update) => update.state === "waiting").length, 4);
+  assert.equal(updates.filter((update) => update.state === "waiting").length, 3);
   assert.deepEqual(
     updates
       .filter((update) => update.state !== "waiting")
       .map((update) => update.state)
       .sort(),
-    ["challenge", "http-error", "not-json", "timeout"],
+    ["challenge", "http-error", "timeout"],
   );
   const timeout = updates.find((update) => update.state === "timeout")!;
-  assert.equal(new URL(timeout.url).hostname, "removed-gateway.invalid");
+  assert.equal(new URL(timeout.url).hostname, "gateway.pinata.cloud");
 });
