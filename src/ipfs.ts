@@ -1,3 +1,5 @@
+import { normalizeGateway } from "./gateway-settings.js";
+
 interface IpfsUrlParts {
   namespace: "ipfs" | "ipns";
   identifier: string;
@@ -127,16 +129,27 @@ export function ipfsIoGatewayUrl(url: string) {
   return `https://ipfs.io/${ipfsUrlParts.namespace}/${ipfsUrlParts.identifier}${ipfsUrlParts.path}${ipfsUrlParts.search}`;
 }
 
-export function ipfsRawGatewayUrls(url: string) {
+export function ipfsRawGatewayUrls(url: string, customGateway?: string) {
   const ipfsUrlParts = getIpfsUrlParts(url);
   if (ipfsUrlParts === undefined) {
     return [];
   }
 
   const path = `${ipfsUrlParts.namespace}/${ipfsUrlParts.identifier}${ipfsUrlParts.path}${ipfsUrlParts.search}`;
-  return [
+  const urls = [
     `https://ipfs.io/${path}`,
     `https://gateway.pinata.cloud/${path}`,
     `https://gateway.ipfs.io/${path}`,
   ];
+  if (customGateway) {
+    try {
+      const gateway = normalizeGateway(customGateway);
+      if (gateway) {
+        urls.push(`${gateway}/${path}`);
+      }
+    } catch {
+      // Invalid stored settings must leave the public gateways available.
+    }
+  }
+  return [...new Set(urls)];
 }

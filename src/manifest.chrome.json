@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "JSONView",
-  "version": "3.3.1",
+  "version": "3.4.0",
   "description": "__MSG_extensionDescription__",
   "author": "Benjamin Hollis",
   "homepage_url": "https://jsonview.com/",
@@ -31,5 +31,9 @@
       "matches": ["<all_urls>"]
     }
   ],
+  "action": {
+    "default_title": "JSONView settings",
+    "default_popup": "popup.html"
+  },
   "default_locale": "en"
 }

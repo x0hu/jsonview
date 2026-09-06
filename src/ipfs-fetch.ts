@@ -1,3 +1,4 @@
+import { readCustomGateway } from "./gateway-settings.js";
 import { decodeJSONDataUrl } from "./data-url.js";
 import { ipfsRawGatewayUrls } from "./ipfs.js";
 import { safeStringEncodeNums } from "./safe-encode-numbers.js";
@@ -53,8 +54,9 @@ export async function fetchIpfsResource(
   fetcher: typeof fetch = fetch,
   timeoutMs = 15000,
   onProgress?: (progress: IpfsGatewayProgress) => void,
+  customGateway?: string,
 ): Promise<IpfsJsonResult | IpfsMediaResult> {
-  const urls = ipfsRawGatewayUrls(url);
+  const urls = ipfsRawGatewayUrls(url, customGateway ?? await readCustomGateway());
   if (urls.length === 0) {
     throw new Error("Not an IPFS URL");
   }

@@ -1,3 +1,9 @@
+## JSONView 3.4.0
+
+- Add a toolbar popup to save, reveal, or remove a custom HTTPS IPFS gateway.
+- Store the gateway locally without browser sync and include it in the public gateway race on the next request.
+- Validate gateway URLs and keep the public gateways working if the custom gateway fails.
+
 ## JSONView 3.3.1
 
 - Remove the private gateway from requests, documentation, and test fixtures. Race only the three public gateways.

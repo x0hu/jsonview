@@ -63,3 +63,9 @@ pnpm start
 - Chrome: https://chrome.google.com/webstore/devconsole/
 - Firefox: https://addons.mozilla.org/en-US/developers/addons
 - Edge: https://partner.microsoft.com/en-us/dashboard/microsoftedge/overview
+
+### Your own IPFS gateway
+
+Click the JSONView extension icon to open settings. Enter your HTTPS gateway base URL and select Save gateway. A trailing `/ipfs` is optional. Do not paste a content CID, query token, or username/password. The saved gateway joins the three public gateways on the next request, including nested links and retries. Remove clears the setting.
+
+Settings stay in this browser’s local extension storage and are not synced or bundled in releases. Local storage is not an encrypted secret vault. Revoke any exposed endpoint through your gateway provider before replacing it.

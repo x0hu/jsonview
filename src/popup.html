@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JSONView settings</title>
+  <link rel="stylesheet" href="popup.css">
+  <script type="module" src="popup.js"></script>
+</head>
+<body>
+  <h1>JSONView</h1>
+  <p>Add your own IPFS gateway. The first usable response wins, alongside three public gateways.</p>
+  <form id="gateway-form">
+    <label for="gateway">Your gateway URL</label>
+    <div class="input-row">
+      <input id="gateway" type="password" placeholder="https://your-gateway.example" autocomplete="off" spellcheck="false" aria-describedby="privacy" disabled>
+      <button id="show" type="button" aria-pressed="false">Show</button>
+    </div>
+    <p id="privacy">Saved only in this browser, without browser sync. It is sent requests when you open IPFS content.</p>
+    <div class="actions">
+      <button id="save" type="submit" disabled>Save gateway</button>
+      <button id="remove" type="button" disabled>Remove</button>
+    </div>
+    <p id="status" role="status" aria-live="polite">Loading settings…</p>
+  </form>
+</body>
+</html>
