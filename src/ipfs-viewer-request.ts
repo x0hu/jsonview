@@ -1,23 +1,26 @@
 import { fetchIpfsResource, type IpfsGatewayProgress } from "./ipfs-fetch.js";
+import { ipfsIoGatewayUrl } from "./ipfs.js";
 
-// A challenge must leave the viewer available while the user verifies in a tab.
+// Give fast content a brief chance to win without waiting on stalled gateways.
 export async function requestIpfsForViewer(
   source: string,
   onProgress: (progress: IpfsGatewayProgress) => void,
   fetcher: typeof fetch = fetch,
   timeoutMs = 5000,
 ) {
-  let needsVerification = false;
+  const challenges = new Set<string>();
   try {
     return await fetchIpfsResource(source, fetcher, timeoutMs, (progress) => {
       if (progress.state === "challenge") {
-        needsVerification = true;
+        challenges.add(progress.url);
       }
       onProgress(progress);
-    });
+    }, undefined, { challengeGraceMs: 150 });
   } catch (error) {
-    if (needsVerification) {
-      return { verificationRequired: true as const };
+    if (challenges.size > 0) {
+      const preferred = ipfsIoGatewayUrl(source)!;
+      const verificationUrl = challenges.has(preferred) ? preferred : [...challenges][0];
+      return { verificationRequired: true as const, verificationUrl };
     }
     throw error;
   }

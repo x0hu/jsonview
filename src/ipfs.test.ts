@@ -68,6 +68,7 @@ test("returns raw gateway candidates for IPFS content", () => {
       "https://ipfs.io/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
       "https://gateway.pinata.cloud/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
       "https://gateway.ipfs.io/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
+      "https://bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze.ipfs.inbrowser.link/",
     ],
   );
 });

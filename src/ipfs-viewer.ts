@@ -34,7 +34,12 @@ function showSourceUrl(source: string) {
   original.href = source;
   original.textContent = "Open original";
   original.setAttribute("data-jsonview-original", "");
-  toolbar.append(url, copy, original);
+  const fallback = document.createElement("a");
+  fallback.href = ipfsIoGatewayUrl(source)!;
+  fallback.target = "_self";
+  fallback.textContent = "Open ipfs.io in this tab";
+  fallback.setAttribute("data-jsonview-original", "");
+  toolbar.append(url, copy, original, fallback);
   document.body.prepend(toolbar);
 }
 
@@ -49,7 +54,7 @@ function showGatewayProgress(onRetry: () => void) {
   verification.hidden = true;
   const instructions = document.createElement("p");
   instructions.textContent =
-    "Open a browser check below, complete it yourself in the new tab, then return here and retry.";
+    "A browser check will open automatically in this tab unless another gateway finishes right away. Complete any check the gateway asks for to continue.";
   const verificationLinks = document.createElement("div");
   const retry = document.createElement("button");
   retry.type = "button";
@@ -89,15 +94,15 @@ function showGatewayProgress(onRetry: () => void) {
     row.textContent = `${new URL(progress.url).hostname}: ${labels[progress.state]}${httpStatus}`;
     if (progress.state === "challenge") {
       status.textContent =
-        "A gateway requires a browser check. Trying the other gateways while you verify.";
+        "A gateway requires a browser check. Opening verification shortly…";
       verification.hidden = false;
       if (!challenges.has(progress.url)) {
         challenges.add(progress.url);
         const link = document.createElement("a");
         link.href = progress.url;
-        link.target = "_blank";
+        link.target = "_self";
         link.rel = "noopener noreferrer";
-        link.textContent = `Verify ${new URL(progress.url).hostname}`;
+        link.textContent = `Verify ${new URL(progress.url).hostname} in this tab`;
         link.setAttribute("data-jsonview-original", "");
         verificationLinks.append(link);
       }
@@ -106,15 +111,26 @@ function showGatewayProgress(onRetry: () => void) {
       !status.textContent?.includes("browser check")
     ) {
       status.textContent =
-        "Some gateways are unavailable. Trying the others. You can open the original URL now.";
+        "Some gateways are unavailable. Trying the others. You can open ipfs.io in this tab now.";
     }
   }
   return {
     update,
-    waitForVerification() {
+    showFailure() {
+      verification.hidden = false;
+      instructions.textContent =
+        "Open ipfs.io in this tab using the button above, or retry the gateways.";
+      retry.textContent = "Retry";
+      retry.disabled = false;
+      details.open = true;
+      status.textContent = "Could not load IPFS content from the gateways.";
+    },
+    openVerification(url: string) {
       retry.disabled = false;
       status.textContent =
-        "Browser verification is needed. Complete a check in the new tab, then select Retry after verification.";
+        "Opening the gateway’s browser check in this tab…";
+      // Replace the viewer so Back returns to the referring page without restarting the check.
+      window.location.replace(url);
     },
   };
 }
@@ -132,7 +148,7 @@ if (source && ipfsIoGatewayUrl(source)) {
     void requestIpfsForViewer(source!, progress.update)
       .then((result) => {
         if ("verificationRequired" in result) {
-          progress.waitForVerification();
+          progress.openVerification(result.verificationUrl);
           return;
         }
         if ("media" in result) {
@@ -145,8 +161,7 @@ if (source && ipfsIoGatewayUrl(source)) {
         installIpfsLinkListeners();
       })
       .catch(() => {
-        // Ordinary failures still fall back to the original URL.
-        window.location.replace(publicUrl);
+        progress.showFailure();
       });
   }
   load();

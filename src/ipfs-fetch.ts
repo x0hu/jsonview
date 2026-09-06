@@ -55,6 +55,7 @@ export async function fetchIpfsResource(
   timeoutMs = 15000,
   onProgress?: (progress: IpfsGatewayProgress) => void,
   customGateway?: string,
+  options?: { challengeGraceMs?: number },
 ): Promise<IpfsJsonResult | IpfsMediaResult> {
   const urls = ipfsRawGatewayUrls(url, customGateway ?? await readCustomGateway());
   if (urls.length === 0) {
@@ -62,6 +63,7 @@ export async function fetchIpfsResource(
   }
   const controllers = urls.map(() => new AbortController());
   let timeout: ReturnType<typeof setTimeout> | undefined;
+  let challengeTimeout: ReturnType<typeof setTimeout> | undefined;
   const started = Date.now();
   const pending = new Set(urls);
   let timedOut = false;
@@ -90,6 +92,9 @@ export async function fetchIpfsResource(
               headers: { Accept: "application/json" },
               signal: controllers[index].signal,
             });
+            if (controllers[index].signal.aborted) {
+              return;
+            }
             status = response.status;
             if (response.headers.get("cf-mitigated") === "challenge") {
               failure = "challenge";
@@ -105,6 +110,9 @@ export async function fetchIpfsResource(
               return;
             }
             const content = await response.text();
+            if (controllers[index].signal.aborted) {
+              return;
+            }
             failure = "not-json";
             const json = parseIpfsJson(content);
             report(gatewayUrl, "json", status);
@@ -114,6 +122,16 @@ export async function fetchIpfsResource(
               return;
             }
             report(gatewayUrl, failure, status);
+            if (
+              failure === "challenge" &&
+              options?.challengeGraceMs !== undefined &&
+              challengeTimeout === undefined
+            ) {
+              // Bound the wait from the first check; later checks must not extend it.
+              challengeTimeout = setTimeout(() => {
+                reject(new Error("Gateway requires an interactive browser check"));
+              }, options.challengeGraceMs);
+            }
             remaining -= 1;
             if (remaining === 0) {
               reject(new Error("No IPFS gateway returned usable content"));
@@ -124,6 +142,7 @@ export async function fetchIpfsResource(
     });
   } finally {
     clearTimeout(timeout);
+    clearTimeout(challengeTimeout);
     for (const [index, controller] of controllers.entries()) {
       if (pending.has(urls[index])) {
         report(urls[index], timedOut ? "timeout" : "cancelled");

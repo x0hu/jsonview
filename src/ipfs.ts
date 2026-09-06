@@ -141,6 +141,12 @@ export function ipfsRawGatewayUrls(url: string, customGateway?: string) {
     `https://gateway.pinata.cloud/${path}`,
     `https://gateway.ipfs.io/${path}`,
   ];
+  // The linked gateway may already have the content while public gateways stall.
+  const original = new URL(url);
+  if (original.protocol === "https:" || original.protocol === "http:") {
+    original.hash = "";
+    urls.push(original.href);
+  }
   if (customGateway) {
     try {
       const gateway = normalizeGateway(customGateway);

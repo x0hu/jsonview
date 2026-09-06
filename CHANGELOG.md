@@ -1,3 +1,10 @@
+## JSONView 3.4.1
+
+- Open browser verification automatically in the same tab, with at most 150 ms of extra waiting after a confirmed challenge.
+- Use a fast content response before verification when it arrives during that brief wait, and cancel remaining requests.
+- Include the original IPFS gateway alongside public and configured gateways.
+- Keep the viewer open on ordinary failures, with Retry and an immediate link to ipfs.io.
+
 ## JSONView 3.4.0
 
 - Add a toolbar popup to save, reveal, or remove a custom HTTPS IPFS gateway.
