@@ -1,6 +1,6 @@
 {
   "id": "jsonview@brh.numbera.com",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "name": "jsonview",
   "title": "JSONView",
   "description": "View JSON documents in the browser.",
@@ -10,7 +10,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "start": "./build.sh",
+    "start": "node scripts/build.mjs",
     "lint": "eslint src",
     "watch": "npm-watch",
     "rollup": "rollup",
@@ -18,7 +18,14 @@
   },
   "watch": {
     "start": {
-      "patterns": ["src", "scripts", "build.sh", "tsconfig.json", "package.json", "license.txt"],
+      "patterns": [
+        "src",
+        "scripts",
+        "build.sh",
+        "tsconfig.json",
+        "package.json",
+        "license.txt"
+      ],
       "extensions": "js,mjs,ts,css,html,json,png,sh,txt",
       "legacyWatch": true,
       "delay": 500
@@ -126,6 +133,7 @@
     "eslint-plugin-array-func": "^5.0.2",
     "eslint-plugin-github": "^5.1.5",
     "eslint-plugin-sonarjs": "^1.0.4",
+    "fflate": "^0.8.3",
     "globals": "^15.14.0",
     "http-server": "^14.1.1",
     "npm-watch": "^0.13.0",

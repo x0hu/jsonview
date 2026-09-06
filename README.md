@@ -32,10 +32,11 @@ Use the GitHub [Issue tracker for JSONView](https://github.com/bhollis/jsonview/
 
 Before contributing to JSONView, make sure to read the [Contributing Guidelines](CONTRIBUTING.md). I appreciate contributions people make to JSONView, but the goal of the extension is to be simple and straightforward, so I frequently reject contributions that add complexity or unnecessary features. Please consider filing an issue before doing any work, so you don't waste time on something I won't accept.
 
-- Install [NodeJS](https://nodejs.org/en/) and run `corepack enable`.
+- Install [NodeJS](https://nodejs.org/en/) 20 or newer.
 - Check out jsonview.
-- Run `pnpm i` inside the jsonview repository.
-- Run `pnpm start` to build the extension.
+- Run `npm install` inside the jsonview repository.
+- Run `npm start` to build the extension. This works in Windows Command Prompt, PowerShell, macOS, and Linux without Bash or a separate ZIP tool.
+- The build creates `build-chrome`, `build-firefox`, and both ZIP packages. If you prefer pnpm, run `corepack enable`, `pnpm install`, and `pnpm start`.
 - Run `npm run watch` to rebuild both browser extensions automatically whenever source files, styles, HTML, manifests, translations, icons, or build configuration change. Keep the watcher running while developing. Reload the extension in your browser and refresh open pages to load the rebuilt files.
 - In Firefox, go to `about:debugging#addons` in the address bar, check "Enable add-on debugging", select "Load Temporary Add-on", and choose the `jsonview/build-firefox/manifest.json` file.
 - In Chrome, Edge, etc., go to `edge://extensions/`, in the address bar, enable "Developer mode", select "Load Unpacked", and choose the `jsonview/build-chrome` folder.

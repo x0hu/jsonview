@@ -1,3 +1,14 @@
+## JSONView 3.3.0
+
+- Race four IPFS gateways and use the first usable response, cancelling the remaining requests.
+- Open nested IPFS media links without waiting for JSON failures or gateway timeouts.
+- Apply bundled JSON styles before rendering, including JSON inside gateway HTML wrappers.
+- Show the original public URL with Copy URL and Open original controls.
+- Report gateway errors and offer manual browser verification with an explicit retry.
+- Validate IPFS subdomains and leave native links working after an extension reload.
+- Support base64 JSON data URLs.
+- Build and package Chrome and Firefox extensions with Node.js on Windows, macOS, and Linux. Watch source files and assets for automatic rebuilds.
+
 ## JSONView 3.2.0
 
 - Added a specific workaround for Microsoft SharePoint sites, which say they are returning JSON when they are really returning HTML from their service worker.
