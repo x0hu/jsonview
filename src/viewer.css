@@ -206,12 +206,44 @@ h1 {
   font: 0.85rem monospace;
 }
 
-.viewer-source button {
+.viewer-source button,
+.viewer-source a,
+.gateway-verification a,
+.gateway-verification button {
   flex-shrink: 0;
+  text-decoration: none;
+  font: inherit;
   cursor: pointer;
   border: 1px solid var(--json-error-border);
   border-radius: 4px;
   padding: 0.3rem 0.6rem;
   background: var(--json-error-background);
   color: var(--json-foreground);
+}
+
+#ipfs-loading-status,
+.gateway-progress {
+  margin: 1rem;
+}
+
+.gateway-progress summary {
+  cursor: pointer;
+}
+
+.gateway-progress li {
+  margin: 0.4rem 0;
+}
+
+.gateway-verification {
+  margin: 1rem;
+}
+
+.gateway-verification a {
+  display: inline-block;
+  margin: 0 0.5rem 0.75rem 0;
+}
+
+.gateway-verification button:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
