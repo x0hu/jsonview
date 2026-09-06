@@ -51,12 +51,20 @@ const jsonContent = [
     `<span class="collapser"></span>{<ul class="obj collapsible"><li><span class="spacer">&nbsp;&nbsp;</span><span class="prop" title="&lt;root&gt;.metadataUri"><span class="q">&quot;</span>metadataUri<span class="q">&quot;</span></span>: <a href="https://ipfs.io/ipfs/bafkreieuew6at7kgjdrv5uvsr3m6uogfx6dip2qbl5rzio7fzi5l4o6pim"><span class="q">&quot;</span>ipfs://bafkreieuew6at7kgjdrv5uvsr3m6uogfx6dip2qbl5rzio7fzi5l4o6pim<span class="q">&quot;</span></a></li></ul><span class="spacer"></span>}`,
   ],
   [
+    `{ "metadataUri": "data:application/json;base64,eyJvayI6dHJ1ZX0=" }`,
+    `<span class="collapser"></span>{<ul class="obj collapsible"><li><span class="spacer">&nbsp;&nbsp;</span><span class="prop" title="&lt;root&gt;.metadataUri"><span class="q">&quot;</span>metadataUri<span class="q">&quot;</span></span>: <a href="data:application/json;base64,eyJvayI6dHJ1ZX0="><span class="q">&quot;</span>data:application/json;base64,eyJvayI6dHJ1ZX0=<span class="q">&quot;</span></a></li></ul><span class="spacer"></span>}`,
+  ],
+  [
     `{ "notLink": "http://jsonview.com is great" }`,
     `<span class="collapser"></span>{<ul class="obj collapsible"><li><span class="spacer">&nbsp;&nbsp;</span><span class="prop" title="&lt;root&gt;.notLink"><span class="q">&quot;</span>notLink<span class="q">&quot;</span></span>: <span class="string">&quot;http://jsonview.com is great&quot;</span></li></ul><span class="spacer"></span>}`,
   ],
   [
     `{ "notIpfsLink": "ipfs://bafkreieuew6at7kgjdrv5uvsr3m6uogfx6dip2qbl5rzio7fzi5l4o6pim is great" }`,
     `<span class="collapser"></span>{<ul class="obj collapsible"><li><span class="spacer">&nbsp;&nbsp;</span><span class="prop" title="&lt;root&gt;.notIpfsLink"><span class="q">&quot;</span>notIpfsLink<span class="q">&quot;</span></span>: <span class="string">&quot;ipfs://bafkreieuew6at7kgjdrv5uvsr3m6uogfx6dip2qbl5rzio7fzi5l4o6pim is great&quot;</span></li></ul><span class="spacer"></span>}`,
+  ],
+  [
+    `{ "notDataUriLink": "data:application/json;base64,eyJvayI6dHJ1ZX0= is great" }`,
+    `<span class="collapser"></span>{<ul class="obj collapsible"><li><span class="spacer">&nbsp;&nbsp;</span><span class="prop" title="&lt;root&gt;.notDataUriLink"><span class="q">&quot;</span>notDataUriLink<span class="q">&quot;</span></span>: <span class="string">&quot;data:application/json;base64,eyJvayI6dHJ1ZX0= is great&quot;</span></li></ul><span class="spacer"></span>}`,
   ],
   [
     `{ "aZero": 0 }`,

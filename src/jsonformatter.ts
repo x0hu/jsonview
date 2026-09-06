@@ -3,6 +3,8 @@
  * each of which returns an HTML document.
  */
 
+import { isJSONDataUrl } from "./data-url.js";
+
 /** Convert a whole JSON value / JSONP response into a formatted HTML document */
 export function jsonToHTML(json: any, uri: string) {
   return toHTML(jsonToHTMLBody(json), uri);
@@ -80,6 +82,9 @@ function linkHrefForString(value: string) {
   if (/^ipfs:\/\/[^\s]+$/i.test(value)) {
     return `https://ipfs.io/ipfs/${value.slice("ipfs://".length)}`;
   }
+  if (isJSONDataUrl(value)) {
+    return value;
+  }
   return undefined;
 }
 
@@ -99,7 +104,7 @@ export function valueToHTML(value: any, path: string, indent: number) {
       return decorateWithSpan(value, "num");
     case "boolean":
       return decorateWithSpan(value, "bool");
-    case "string":
+    case "string": {
       if (value.charCodeAt(0) === 8203 /* zero-width space */ && !isNaN(Number(value.slice(1)))) {
         return decorateWithSpan(Number(value.slice(1)), "num");
       }
@@ -111,6 +116,7 @@ export function valueToHTML(value: any, path: string, indent: number) {
       } else {
         return `<span class="string">&quot;${jsString(value)}&quot;</span>`;
       }
+    }
     default:
       return "";
   }

@@ -13,6 +13,12 @@ Once you've got JSONView installed, check out [this example JSON file](http://js
 
 If you'd like to contribute to JSONView but don't want to code, consider contributing a translation. Copy the existing localization files from `src/_locale` and fill them in for your own language, then send a pull request. You can do it all from the GitHub interface. There are not many strings to translate!
 
+## IPFS links
+
+Clicking an IPFS gateway link opens JSONView's extension viewer and requests the same CID and path from `ipfs.io`, `removed-gateway.invalid`, `gateway.pinata.cloud`, and `gateway.ipfs.io` concurrently. The first complete, successful JSON response wins; the other requests are cancelled. Image, audio, and video links open as soon as a gateway returns successful media headers, without waiting for the other gateways. Errors and HTML gateway loading pages cannot win the race. If no gateway provides JSON within 15 seconds, the viewer opens the original link normally.
+
+Directly opened IPFS pages also support JSON embedded in a gateway's HTML wrapper, including content inserted after loading. The extension bundles its stylesheet and applies it synchronously before showing formatted JSON. JSON already available on an IPFS page does not wait for a background-worker response. The extension viewer shows the original public URL with a Copy URL button.
+
 ## Keyboard Shortcuts
 
 - Left Arrow - Collapses the json on key up
@@ -30,6 +36,7 @@ Before contributing to JSONView, make sure to read the [Contributing Guidelines]
 - Check out jsonview.
 - Run `pnpm i` inside the jsonview repository.
 - Run `pnpm start` to build the extension.
+- Run `npm run watch` to rebuild both browser extensions automatically whenever source files, styles, HTML, manifests, translations, icons, or build configuration change. Keep the watcher running while developing. Reload the extension in your browser and refresh open pages to load the rebuilt files.
 - In Firefox, go to `about:debugging#addons` in the address bar, check "Enable add-on debugging", select "Load Temporary Add-on", and choose the `jsonview/build-firefox/manifest.json` file.
 - In Chrome, Edge, etc., go to `edge://extensions/`, in the address bar, enable "Developer mode", select "Load Unpacked", and choose the `jsonview/build-chrome` folder.
 - Run `pnpm tests` to start a little webserver that serves all the JSON files in `./tests`.

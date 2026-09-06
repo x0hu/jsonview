@@ -1,3 +1,6 @@
+import { fetchIpfsJson } from "./ipfs-fetch.js";
+import { isIpfsGatewayUrl } from "./ipfs.js";
+
 import { isJSONContentType } from "./content-type";
 
 function isRedirect(status: number) {
@@ -44,6 +47,13 @@ export function isEventJSON(
 // respond accordingly.
 export function installMessageListener() {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message === "jsonview-ipfs-json" && sender.url && isIpfsGatewayUrl(sender.url)) {
+      void fetchIpfsJson(sender.url)
+        .then(sendResponse)
+        .catch(() => sendResponse(null));
+      return true;
+    }
+
     if (message !== "jsonview-is-json") {
       return;
     }

@@ -29,6 +29,11 @@ const ipfsGatewayConversions = [
 ];
 
 const nonIpfsGatewayUrls = [
+  "https://discuss.ipfs.tech/t/curated-list-of-ipfs-gateways/620?page=2",
+  "https://gateway.ipfs.io/",
+  "https://docs.ipfs.tech/",
+  "https://blog.ipfs.example.com/article",
+
   "https://api.bankr.bot/token-launches/0x0BB65e58E178C82B9148072632DE329655fa0Ba3",
   "https://example.com/ipfs",
   "https://example.com/not-ipfs/bafkreieuew6at7kgjdrv5uvsr3m6uogfx6dip2qbl5rzio7fzi5l4o6pim",
@@ -61,7 +66,43 @@ test("returns raw gateway candidates for IPFS content", () => {
     ),
     [
       "https://ipfs.io/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
-      "https://dweb.link/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
+      "https://removed-gateway.invalid/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
+      "https://gateway.pinata.cloud/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
+      "https://gateway.ipfs.io/ipfs/bafkreiguejqtyoal6j5rgmjvr6kljpmajed2wkxgpukhwzf5qkmilmraze",
     ],
   );
+});
+
+test("races the same CID and path on all four hosts, retaining query parameters", () => {
+  const path =
+    "/ipfs/QmWaZ7imFJPcYDLPUykLycbtG2DhmYckqXMosFVWx9DUsN/folder/meta.json?filename=meta.json";
+  assert.deepEqual(
+    ipfsRawGatewayUrls(`https://removed-gateway.invalid${path}#fragment`),
+    [
+      `https://ipfs.io${path}`,
+      `https://removed-gateway.invalid${path}`,
+      `https://gateway.pinata.cloud${path}`,
+      `https://gateway.ipfs.io${path}`,
+    ],
+  );
+});
+
+test("recognizes base36 CIDv1 subdomains and rejects malformed CIDs", () => {
+  const digest = "00".repeat(32);
+  const cid = `k${BigInt(`0x01551220${digest}`).toString(36)}`;
+  assert.ok(isIpfsGatewayUrl(`https://${cid}.ipfs.dweb.link/metadata.json`));
+  for (const bytes of ["02551220" + digest, "01551220", "0180"]) {
+    const invalidCid = `k${BigInt(`0x${bytes}`).toString(36)}`;
+    assert.equal(isIpfsGatewayUrl(`https://${invalidCid}.ipfs.dweb.link/`), false);
+  }
+});
+
+test("does not generate requests for the IPFS forum or gateway homepage", () => {
+  for (const url of [
+    "https://discuss.ipfs.tech/t/curated-list-of-ipfs-gateways/620?page=2",
+    "https://gateway.ipfs.io/",
+  ]) {
+    assert.equal(ipfsIoGatewayUrl(url), undefined);
+    assert.deepEqual(ipfsRawGatewayUrls(url), []);
+  }
 });

@@ -18,8 +18,10 @@
   },
   "watch": {
     "start": {
-      "patterns": "src/*.ts",
-      "extensions": "js,ts"
+      "patterns": ["src", "scripts", "build.sh", "tsconfig.json", "package.json", "license.txt"],
+      "extensions": "js,mjs,ts,css,html,json,png,sh,txt",
+      "legacyWatch": true,
+      "delay": 500
     }
   },
   "contributors": [

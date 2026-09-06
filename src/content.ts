@@ -1,26 +1,45 @@
 import { errorPage, jsonToHTML } from "./jsonformatter";
 
 import { installCollapseEventListeners } from "./collapse";
-import { ipfsRawGatewayUrls, isIpfsGatewayUrl } from "./ipfs";
+import { decodeJSONDataUrl } from "./data-url.js";
+import { isIpfsGatewayUrl } from "./ipfs";
+import { parseIpfsJson, type IpfsJsonResult } from "./ipfs-fetch.js";
+import { installIpfsLinkListeners } from "./ipfs-links.js";
+import { renderDocument } from "./render-document.js";
+import { isJSONContentType } from "./content-type.js";
 import { safeStringEncodeNums } from "./safe-encode-numbers";
+
+installIpfsLinkListeners();
 
 /**
  * This script runs on every page. It communicates with the background script
  * to help decide whether to treat the contents of the page as JSON.
  */
-chrome.runtime.sendMessage("jsonview-is-json", (response: boolean) => {
-  void renderJson(response);
-});
+initializeViewer();
 
-async function renderJson(response: boolean) {
-  const isKnownJsonResponse = response === true;
-  const shouldTryJsonResponse = !isKnownJsonResponse && isIpfsGatewayUrl(document.URL);
-
-  if (shouldTryJsonResponse) {
-    await renderIpfsGatewayResponse();
+function initializeViewer() {
+  // Native media documents need neither JSON detection nor another gateway race.
+  if (/^(?:image|audio|video)\//i.test(document.contentType)) {
     return;
   }
+  if (isIpfsGatewayUrl(document.URL)) {
+    renderIpfsGatewayResponse();
+  } else if (
+    isJSONContentType(document.contentType) &&
+    document.body?.childElementCount === 1 &&
+    document.body.firstElementChild?.tagName === "PRE"
+  ) {
+    // Native JSON documents can render without waking the background worker.
+    renderJson(true);
+  } else {
+    chrome.runtime.sendMessage("jsonview-is-json", (response: boolean) => {
+      renderJson(response);
+    });
+  }
+}
 
+function renderJson(response: boolean) {
+  const isKnownJsonResponse = response;
   if (!isKnownJsonResponse) {
     return;
   }
@@ -32,7 +51,8 @@ async function renderJson(response: boolean) {
     content = jsonElems[0].textContent;
   } else {
     // Sometimes there's no pre? I'm not sure why this would happen
-    content = (document.body.firstChild ?? document.body).textContent;
+    const body = document.body ?? document.documentElement;
+    content = (body.firstChild ?? body).textContent;
   }
   let outputDoc = "";
   let jsonObj: any = null;
@@ -40,40 +60,71 @@ async function renderJson(response: boolean) {
   if (content === null) {
     outputDoc = errorPage(new Error("No content"), "", document.URL);
   } else {
+    let parseContent = content;
     try {
+      parseContent = decodeJSONDataUrl(content) ?? content;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      jsonObj = JSON.parse(safeStringEncodeNums(content));
+      jsonObj = JSON.parse(safeStringEncodeNums(parseContent));
       outputDoc = jsonToHTML(jsonObj, document.URL);
     } catch (e) {
       outputDoc = errorPage(
         e instanceof Error ? e : typeof e === "string" ? new Error(e) : new Error("Unknown error"),
-        content,
+        parseContent,
         document.URL,
       );
     }
   }
 
-  document.documentElement.innerHTML = outputDoc;
+  renderDocument(outputDoc);
   installCollapseEventListeners();
 }
 
-async function renderIpfsGatewayResponse() {
-  for (const gatewayUrl of ipfsRawGatewayUrls(document.URL)) {
-    let content: string;
-    try {
-      const response = await fetch(gatewayUrl, { credentials: "omit" });
-      content = await response.text();
-    } catch {
-      continue;
-    }
+function renderIpfsGatewayResponse() {
+  let rendered = false;
+  const observer = new MutationObserver(() => tryEmbeddedJson());
+  const timeout = setTimeout(() => observer.disconnect(), 15000);
 
+  function render(content: string) {
+    if (rendered) {
+      return true;
+    }
     try {
-      const jsonObj: unknown = JSON.parse(safeStringEncodeNums(content));
-      document.documentElement.innerHTML = jsonToHTML(jsonObj, document.URL);
+      const jsonObj = parseIpfsJson(content);
+      rendered = true;
+      observer.disconnect();
+      clearTimeout(timeout);
+      renderDocument(jsonToHTML(jsonObj, document.URL));
       installCollapseEventListeners();
-      return;
+      return true;
     } catch {
-      continue;
+      return false;
     }
   }
+
+  function tryEmbeddedJson() {
+    for (const element of document.querySelectorAll("pre")) {
+      if (element.textContent && render(element.textContent)) {
+        return true;
+      }
+    }
+    if (document.contentType !== "text/html") {
+      return render(document.body?.textContent ?? "");
+    }
+    return false;
+  }
+
+  if (tryEmbeddedJson()) {
+    return;
+  }
+  // Some gateways insert their JSON after their service worker finishes loading.
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+  });
+  chrome.runtime.sendMessage("jsonview-ipfs-json", (result: IpfsJsonResult | null) => {
+    if (!chrome.runtime.lastError && result) {
+      render(result.content);
+    }
+  });
 }

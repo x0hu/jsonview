@@ -188,3 +188,30 @@ h1 {
 :is(.spacer, :not(.quoted) > .q)::selection {
   background-color: transparent;
 }
+
+.viewer-source {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--json-error-border);
+  background: var(--json-background);
+}
+
+.viewer-source input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--json-link);
+  font: 0.85rem monospace;
+}
+
+.viewer-source button {
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 1px solid var(--json-error-border);
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  background: var(--json-error-background);
+  color: var(--json-foreground);
+}
