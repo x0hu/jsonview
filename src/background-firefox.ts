@@ -6,6 +6,7 @@
  */
 
 import { addJsonUrl, installMessageListener, isEventJSON } from "./background-common";
+import { installDataUrlNavigationListener } from "./data-navigation.js";
 
 function detectJSON(event: chrome.webRequest.WebResponseHeadersDetails) {
   const header = isEventJSON(event);
@@ -29,3 +30,4 @@ chrome.webRequest.onHeadersReceived.addListener(
 );
 
 installMessageListener();
+installDataUrlNavigationListener();

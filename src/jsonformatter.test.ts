@@ -3,6 +3,31 @@ import test from "node:test";
 import { valueToHTML } from "./jsonformatter.js";
 import { safeStringEncodeNums } from "./safe-encode-numbers.js";
 
+test("bare IPFS CIDs become links in nested JSON values", () => {
+  const cids = [
+    "bafkreian3onryw435mjpjlv6ggdtkudu6shozrciv3pm53dmegequdrjhm",
+    "QmYwAPJzv5CZsnAzt8auVZRnGi2C7cZ9sJMYMZyS9kQf8S",
+  ];
+  const html = valueToHTML({ images: cids }, "<root>", 0);
+  for (const cid of cids) {
+    assert.ok(html.includes(`<a href="https://ipfs.io/ipfs/${cid}">`));
+    assert.ok(html.includes(`<span class="q">&quot;</span>${cid}<span class="q">&quot;</span>`));
+  }
+});
+
+test("CID-like text stays plain text", () => {
+  const cid = "bafkreian3onryw435mjpjlv6ggdtkudu6shozrciv3pm53dmegequdrjhm";
+  for (const value of [
+    "banana",
+    cid.slice(0, -1),
+    `${cid} is an image`,
+    `${cid}"<script>`,
+    "Qm" + "0".repeat(44),
+  ]) {
+    assert.ok(!valueToHTML(value, "<root>", 0).includes("<a "));
+  }
+});
+
 const jsonContent = [
   [`{}`, `{ }`],
   [
@@ -52,7 +77,7 @@ const jsonContent = [
   ],
   [
     `{ "metadataUri": "data:application/json;base64,eyJvayI6dHJ1ZX0=" }`,
-    `<span class="collapser"></span>{<ul class="obj collapsible"><li><span class="spacer">&nbsp;&nbsp;</span><span class="prop" title="&lt;root&gt;.metadataUri"><span class="q">&quot;</span>metadataUri<span class="q">&quot;</span></span>: <a href="data:application/json;base64,eyJvayI6dHJ1ZX0="><span class="q">&quot;</span>data:application/json;base64,eyJvayI6dHJ1ZX0=<span class="q">&quot;</span></a></li></ul><span class="spacer"></span>}`,
+    `<span class="collapser"></span>{<ul class="obj collapsible"><li><span class="spacer">&nbsp;&nbsp;</span><span class="prop" title="&lt;root&gt;.metadataUri"><span class="q">&quot;</span>metadataUri<span class="q">&quot;</span></span>: <a href="data-viewer.html#data%3Aapplication%2Fjson%3Bbase64%2CeyJvayI6dHJ1ZX0%3D"><span class="q">&quot;</span>data:application/json;base64,eyJvayI6dHJ1ZX0=<span class="q">&quot;</span></a></li></ul><span class="spacer"></span>}`,
   ],
   [
     `{ "notLink": "http://jsonview.com is great" }`,

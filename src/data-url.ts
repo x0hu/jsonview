@@ -1,6 +1,23 @@
 const jsonDataUrlPrefix = "data:application/json;base64,";
 const jsonDataUrlPattern = /^data:application\/json;base64,[A-Za-z0-9+/]+={0,2}$/i;
 
+export function dataUrlMediaType(value: string): string | undefined {
+  const match = /^data:((?:image|application)\/[a-z0-9!#$&^_.+-]+)((?:;[a-z0-9!#$&^_.+-]+=[^;,\s]+)*)(;base64)?,([^\s]*)$/i.exec(value);
+  if (!match || /%(?![a-f0-9]{2})/i.test(match[4])) {
+    return undefined;
+  }
+  if (match[3]) {
+    try {
+      if (!isValidBase64Payload(decodeURIComponent(match[4]))) {
+        return undefined;
+      }
+    } catch {
+      return undefined;
+    }
+  }
+  return match[1].toLowerCase();
+}
+
 export function isJSONDataUrl(value: string) {
   return jsonDataUrlPattern.test(value) && isValidBase64Payload(value.slice(jsonDataUrlPrefix.length));
 }

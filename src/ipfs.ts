@@ -7,6 +7,14 @@ interface IpfsUrlParts {
   search: string;
 }
 
+// Recognize whole CID strings, not arbitrary text that happens to contain one.
+export function isBareIpfsCid(value: string) {
+  return (
+    /^Qm[1-9A-HJ-NP-Za-km-z]{44}$/.test(value) ||
+    (/^[bk][a-z0-9]{5,200}$/.test(value) && isSubdomainCid(value))
+  );
+}
+
 // DNS subdomain gateways use CIDv1 encoded as base32 or base36.
 // Checking the CID structure avoids treating discuss.ipfs.tech as content.
 function isSubdomainCid(identifier: string) {

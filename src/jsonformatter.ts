@@ -3,7 +3,8 @@
  * each of which returns an HTML document.
  */
 
-import { isJSONDataUrl } from "./data-url.js";
+import { dataUrlMediaType } from "./data-url.js";
+import { isBareIpfsCid } from "./ipfs.js";
 
 /** Convert a whole JSON value / JSONP response into a formatted HTML document */
 export function jsonToHTML(json: any, uri: string) {
@@ -76,14 +77,17 @@ function decorateWithSpan(value: any, className: string) {
 }
 
 function linkHrefForString(value: string) {
+  if (isBareIpfsCid(value)) {
+    return `https://ipfs.io/ipfs/${value}`;
+  }
   if (/^(http|https|file):\/\/[^\s]+$/i.test(value)) {
     return value;
   }
   if (/^ipfs:\/\/[^\s]+$/i.test(value)) {
     return `https://ipfs.io/ipfs/${value.slice("ipfs://".length)}`;
   }
-  if (isJSONDataUrl(value)) {
-    return value;
+  if (dataUrlMediaType(value)) {
+    return `${chrome.runtime.getURL("data-viewer.html")}#${encodeURIComponent(value)}`;
   }
   return undefined;
 }

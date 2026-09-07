@@ -1,6 +1,31 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { decodeJSONDataUrl, isJSONDataUrl } from "./data-url.js";
+import { dataUrlMediaType, decodeJSONDataUrl, isJSONDataUrl } from "./data-url.js";
+
+test("recognizes embedded image and application files", () => {
+  for (const [value, type] of [
+    ["data:image/svg+xml;base64,PHN2Zy8+", "image/svg+xml"],
+    ["data:image/svg+xml,%3Csvg%2F%3E", "image/svg+xml"],
+    ["DATA:IMAGE/PNG;BASE64,aGVsbG8=", "image/png"],
+    ["data:application/json;charset=utf-8,%7B%22ok%22%3Atrue%7D", "application/json"],
+    ["data:application/ld+json;base64,e30=", "application/ld+json"],
+    ["data:application/pdf;base64,JVBERg==", "application/pdf"],
+  ]) {
+    assert.equal(dataUrlMediaType(value), type);
+  }
+});
+
+test("leaves malformed and unsupported data URLs as strings", () => {
+  for (const value of [
+    "data:text/html,%3Cscript%3E", "javascript:alert(1)",
+    "data:image/png;base64,%%%", "data:image/png;base64,a",
+    "data:image/png;base64,", "data:image/svg+xml,%ZZ",
+    "data:image/png;base64,aGVsbG8= trailing text", " data:image/png;base64,aGVsbG8=",
+    "data:image/png;base64aGVsbG8=",
+  ]) {
+    assert.equal(dataUrlMediaType(value), undefined, value);
+  }
+});
 
 function dataUrlFor(json: string) {
   return `data:application/json;base64,${Buffer.from(json, "utf8").toString("base64")}`;

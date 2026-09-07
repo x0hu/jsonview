@@ -28,11 +28,11 @@
       "run_at": "document_end"
     }
   ],
-  "permissions": ["webRequest", "storage", "webRequestBlocking"],
+  "permissions": ["tabs", "webRequest", "storage", "webRequestBlocking"],
   "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     {
-      "resources": ["viewer.css", "ipfs-viewer.html"],
+      "resources": ["viewer.css", "ipfs-viewer.html", "data-viewer.html"],
       "matches": ["<all_urls>"]
     }
   ],

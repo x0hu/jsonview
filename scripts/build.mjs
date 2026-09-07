@@ -60,8 +60,9 @@ for (const browser of ["chrome", "firefox"]) {
   await bundle(join(compiled, `background-${browser}.js`), join(output, "background.js"));
   await bundle(join(compiled, "content.js"), join(output, "content.js"));
   await bundle(join(compiled, "ipfs-viewer.js"), join(output, "ipfs-viewer.js"));
+  await bundle(join(compiled, "data-viewer.js"), join(output, "data-viewer.js"));
   await bundle(join(compiled, "popup.js"), join(output, "popup.js"));
-  for (const asset of ["ipfs-viewer.html", "viewer.css", "popup.html", "popup.css", ...icons]) {
+  for (const asset of ["data-viewer.html", "ipfs-viewer.html", "viewer.css", "popup.html", "popup.css", ...icons]) {
     await cp(join(root, "src", asset), join(output, asset));
   }
   await cp(join(root, "src", `manifest.${browser}.json`), join(output, "manifest.json"));
